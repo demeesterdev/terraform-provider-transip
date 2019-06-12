@@ -9,7 +9,7 @@ import (
 
 func dataSourceDomain() *schema.Resource {
 	return &schema.Resource{
-		Read:   dataSourceDomainRead,
+		Read: dataSourceDomainRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -47,6 +47,6 @@ func dataSourceDomainRead(d *schema.ResourceData, m interface{}) error {
 	if err := d.Set("name_servers", nameServers); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
