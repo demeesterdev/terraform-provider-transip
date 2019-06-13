@@ -22,6 +22,10 @@ testacc: fmtcheck
 fmtcheck:
 	@sh "$(CURDIR)/scripts/gofmtcheck.sh"
 
+lint:
+	@echo "==> Checking source code against linters..."
+	golangci-lint run ./...
+
 tools:
 	@echo "==> installing required tooling..."
 	@sh "$(CURDIR)/scripts/gogetcookie.sh"
