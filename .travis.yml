@@ -9,7 +9,6 @@ go:
 env:
   matrix:
   - MODE=unit-tests
-  - MODE=acceptance-test
 
 install:
 # This script is used by the Travis build to install a cookie for
@@ -20,7 +19,7 @@ install:
 
 script:
   - if [[ $MODE == 'unit-tests' ]]; then make test; fi
-  - if [[ $MODE == 'acceptance-test']]; then make testacc; fi
+  - if [[ $MODE == 'lint' ]]; then make testacc; fi
 
 branches:
   only:
