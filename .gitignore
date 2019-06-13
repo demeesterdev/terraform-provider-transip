@@ -1,3 +1,7 @@
+# -------------
+#   golang
+# -------------
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -10,3 +14,20 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+
+# -------------
+#   terraform
+# -------------
+
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# terraform crash log
+**/crash.log
