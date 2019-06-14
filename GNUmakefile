@@ -3,7 +3,7 @@ PKG_NAME=transip
 
 #make sure we catch schema errors during testing
 TF_SCHEMA_PANIC_ON_ERROR=1
-GO111MODULE=on
+GOFLAGS=-mod=vendor
 
 default: build
 
@@ -31,6 +31,7 @@ tools:
 	go get -u github.com/client9/misspell/cmd/misspell
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
-cache:
-	@echo "==> priming cache..."
+vendor:
+	go mod tidy
 	go mod download
+	go mod vendor

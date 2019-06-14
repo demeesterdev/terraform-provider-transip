@@ -5,11 +5,6 @@ services:
 language: go
 go:
 - "1.12.x"
-
-cache:
-  directories:
-    - $HOME/.cache/go-build
-    - $HOME/gopath/pkg/mod
     
 install:
 # This script is used by the Travis build to install a cookie for
@@ -17,12 +12,10 @@ install:
 # packages that live there.
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
+- make tools
 
 stages:
-- prime cache
 - test
-- name: acceptance test
-  if: branch = master AND type != pull_request
 - name: build
   if: branch = master AND type != pull_request
 - name: release
@@ -33,18 +26,21 @@ stages:
 jobs:
   allow_failures:
     - script: make lint
-  include:
-    - stage: prime cache
-      script: make cache      
+  include:     
     - stage: test
-      script: make test
-      env: 
-        - MODE=unit-tests
-    - script: make lint
+      script: make lint
       env:
         - MODE=linters
-    - stage: acceptance test
-      script: make testacc
+    - script: make test
+      if: branch != master OR type = pull_request
+      env: 
+        - MODE=unit-tests
+    - script: make testacc
+      if: branch = master AND type != pull_request
+      env: 
+        - MODE=tests
+    - stage: build
+      script: make build
       
 matrix:
   fast_finish: true
