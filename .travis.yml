@@ -31,6 +31,8 @@ stages:
       tag ~= /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
 
 jobs:
+  allow_failures:
+    - script: make lint
   include:
     - stage: prime cache
       script: make cache      
@@ -47,5 +49,4 @@ jobs:
 matrix:
   fast_finish: true
   allow_failures:
-    - go: "1.12.x"
-      env: MODE=linters
+    - go: tip
