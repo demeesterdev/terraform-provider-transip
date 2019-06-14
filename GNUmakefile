@@ -26,8 +26,6 @@ lint: tools
 	@echo "==> Checking source code against linters..."
 	golangci-lint run ./...
 
-
-
 tools:
 	@echo "==> installing required tooling..."
 	go get -u github.com/client9/misspell/cmd/misspell
