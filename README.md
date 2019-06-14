@@ -1,6 +1,8 @@
 TransIp Terraform Provider
 ==================
 
+[![Build Status](https://travis-ci.org/demeesterdev/terraform-provider-transip.svg?branch=master)](https://travis-ci.org/demeesterdev/terraform-provider-transip)
+
 General Requirements
 ------------
 
