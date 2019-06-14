@@ -24,6 +24,7 @@ stages:
   if: branch = master AND type != pull_request
 - name: release
   if: branch = master AND \
+      type != pull_request AND \
       tag IS present \
       tag ~= /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
 
@@ -39,7 +40,7 @@ jobs:
       env: 
         - MODE=unit-tests
     - script: make testacc
-      if: branch = master
+      if: branch = master AND type != pull_request 
       env: 
         - MODE=acceptance-tests
     - stage: build
