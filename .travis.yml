@@ -32,13 +32,12 @@ jobs:
       env:
         - MODE=linters
     - script: make test
-      if: branch != master OR type = pull_request
       env: 
         - MODE=unit-tests
     - script: make testacc
-      if: branch = master AND type != pull_request
+      if: branch = master
       env: 
-        - MODE=tests
+        - MODE=acceptance-tests
     - stage: build
       script: make build
       
