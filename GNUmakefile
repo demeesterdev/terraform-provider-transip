@@ -9,15 +9,15 @@ GOFLAGS=-mod=vendor
 default: build
 
 build: fmtcheck
-	go install -mod=vendor
+	go install
 
 test: fmtcheck
-	go test -i $(TEST) || exit 1
+	go test -mod=vendor -i $(TEST) || exit 1
 	echo $(TEST) | \
-		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
+		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor
 
 testacc: fmtcheck
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 180m
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 180m -mod=vendor
 
 # Currently required by tf-deploy compile
 fmtcheck:
