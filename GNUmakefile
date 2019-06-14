@@ -3,7 +3,6 @@ PKG_NAME=transip
 
 #make sure we catch schema errors during testing
 TF_SCHEMA_PANIC_ON_ERROR=1
-GO111MODULE=on
 GOFLAGS=-mod=vendor
 
 default: build
@@ -12,12 +11,12 @@ build: fmtcheck
 	go install
 
 test: fmtcheck
-	go test -mod=vendor -i $(TEST) || exit 1
+	go test -i $(TEST) || exit 1
 	echo $(TEST) | \
-		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor
+		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
 testacc: fmtcheck
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 180m -mod=vendor
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 180m
 
 # Currently required by tf-deploy compile
 fmtcheck:
