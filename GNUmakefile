@@ -22,7 +22,7 @@ testacc: fmtcheck
 fmtcheck:
 	@sh "$(CURDIR)/scripts/gofmtcheck.sh"
 
-lint:
+lint: tools
 	@echo "==> Checking source code against linters..."
 	golangci-lint run ./...
 
@@ -31,3 +31,6 @@ tools:
 	@sh "$(CURDIR)/scripts/gogetcookie.sh"
 	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
 	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+
+cache:
+	go mod download

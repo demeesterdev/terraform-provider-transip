@@ -6,10 +6,6 @@ language: go
 go:
 - "1.12.x"
 
-env:
-  matrix:
-  - MODE=unit-tests
-
 cache:
   directories:
     - $HOME/.cache/go-build
@@ -22,14 +18,25 @@ install:
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
 
-script:
-  - if [[ $MODE == 'unit-tests' ]]; then make test; fi
-  - if [[ $MODE == 'lint' ]]; then make testacc; fi
+stages:
+- prime cache
+- tests
+- name: acceptance tests
+  if: branch = master AND type != pull_request
+- name: build
+  if: branch = master AND type != pull_request
+- name: release
+  if: branch = master AND \
+      tag IS present \
+      tag ~= /^([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
 
-branches:
-  only:
-  - master
-matrix:
-  fast_finish: true
-  allow_failures:
-  - go: tip
+jobs:
+  include:
+    - stage: prime cache
+      script: make cache
+    - stage: tests
+      script: make test
+    - stage: acceptance tests
+      script: make testacc
+      
+
