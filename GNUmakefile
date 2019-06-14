@@ -29,8 +29,9 @@ lint: tools
 
 tools:
 	@echo "==> installing required tooling..."
-	go get -u github.com/client9/misspell/cmd/misspell
-	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+	@sh "$(CURDIR)/scripts/gogetcookie.sh"
+	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
+	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
 vendor:
 	go mod tidy
