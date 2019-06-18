@@ -3,7 +3,7 @@ package transip
 import (
 	"fmt"
 
-	"github.com/demeesterdev/terraform-provider-transip/transip/helpers/transip"
+	"github.com/demeesterdev/terraform-provider-transip/transip/helpers/err_fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/transip/gotransip"
@@ -47,7 +47,7 @@ func resourceDomainCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if domainStatus != domain.StatusFree {
-		return transip.CreateDomainUnavailableError(domainName, domainStatus)
+		return err_fmt.CreateDomainUnavailableError(domainName, domainStatus)
 	}
 
 	d.Partial(true)
@@ -120,7 +120,11 @@ func resourceDomainUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceDomainDelete(d *schema.ResourceData, m interface{}) error {
-	return nil
+	c := m.(*gotransip.SOAPClient)
+	domainName := d.Id()
+
+	err := domain.Cancel(c, domainName, gotransip.CancellationTimeEnd)
+	return err
 }
 
 func resourceDomainExists(d *schema.ResourceData, m interface{}) (bool, error) {
@@ -138,7 +142,7 @@ func resourceDomainExists(d *schema.ResourceData, m interface{}) (bool, error) {
 	case domain.StatusInYourAccount:
 		return true, nil
 	}
-	return false, transip.CreateDomainUnavailableError(domainName, domainStatus)
+	return false, err_fmt.CreateDomainUnavailableError(domainName, domainStatus)
 }
 
 func updateDomainNameServers(d *schema.ResourceData, m interface{}) error {
@@ -173,9 +177,9 @@ func awaitDomainAction(d *schema.ResourceData, m interface{}, action string) err
 	if domainAction.Name == "" {
 		if domainAction.HasFailed {
 			return fmt.Errorf("Last domain action failed: %s", domainAction.Message)
-		} else {
-			return nil
 		}
+
+		return nil
 	}
 
 	// no action passed need to wait for current action to finish
@@ -193,9 +197,9 @@ func awaitDomainAction(d *schema.ResourceData, m interface{}, action string) err
 		if domainAction.Name == action {
 			if domainAction.HasFailed {
 				return resource.NonRetryableError(fmt.Errorf("Domain action %s failed: %s", action, domainAction.Message))
-			} else {
-				return resource.RetryableError(fmt.Errorf("Domain action %s running", action))
 			}
+
+			return resource.RetryableError(fmt.Errorf("Domain action %s running", action))
 		}
 
 		return nil

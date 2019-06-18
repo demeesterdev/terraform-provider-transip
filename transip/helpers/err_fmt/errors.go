@@ -1,4 +1,4 @@
-package transip
+package err_fmt
 
 import (
 	"fmt"
