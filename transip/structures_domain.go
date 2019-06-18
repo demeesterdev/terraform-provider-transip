@@ -16,3 +16,11 @@ func expandNameServers(in []interface{}) domain.Nameservers {
 	}
 	return out
 }
+
+func flattenNameServers(in domain.Nameservers) []string {
+	out := make([]string, 0)
+	for _, ns := range in {
+		out = append(out, ns.Hostname)
+	}
+	return out
+}

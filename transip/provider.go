@@ -34,6 +34,9 @@ func Provider() terraform.ResourceProvider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"transip_domain": dataSourceDomain(),
 		},
+		ResourcesMap: map[string]*schema.Resource{
+			"transip_domain": resourceDomain(),
+		},
 		ConfigureFunc: providerConfigure,
 	}
 
