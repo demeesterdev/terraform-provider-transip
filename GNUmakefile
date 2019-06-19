@@ -1,4 +1,5 @@
 TEST?=$$(go list ./... |grep -v 'vendor'|grep -v 'examples')
+TESTSUMARGS=--format short-verbose --no-color
 PKG_NAME=transip
 
 #make sure we catch schema errors during testing
@@ -12,22 +13,22 @@ build: fmtcheck
 	go install
 
 test: fmtcheck
-	go test -mod=vendor -i $(TEST) || exit 1
+	gotestsum $(TESTSUMARGS) -- -mod=vendor -i $(TEST) || exit 1
 	echo $(TEST) | \
-		xargs -t -n4 gotestsum --format short-verbose -- $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor
+		xargs -t -n4 gotestsum $(TESTSUMARGS) -- $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor
 
 testcover: fmtcheck
 	go test -mod=vendor -i $(TEST) || exit 1
 	echo $(TEST) | \
-		xargs -t -n4 gotestsum --format short-verbose -- $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor -covermode=count -coverprofile=cover.out
+		xargs -t -n4 gotestsum $(TESTSUMARGS) -- $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor -covermode=count -coverprofile=cover.out
 	go tool cover -html=cover.out
 
 
 testacc: fmtcheck
-	TF_ACC=1 gotestsum --format short-verbose -- $(TEST) $(TESTARGS) -timeout 180m
+	TF_ACC=1 gotestsum $(TESTSUMARGS) -- $(TEST) $(TESTARGS) -timeout 180m -mod=vendor
 
 testacccover: fmtcheck
-	TF_ACC=1 gotestsum --format short-verbose -- $(TEST) $(TESTARGS) -timeout 180m -covermode=count -coverprofile=cover-acc.out
+	TF_ACC=1 gotestsum $(TESTSUMARGS) -- $(TEST) $(TESTARGS) -timeout 180m -mod=vendor -covermode=count -coverprofile=cover-acc.out
 	go tool cover -html=cover-acc.out
 
 # Currently required by tf-deploy compile
