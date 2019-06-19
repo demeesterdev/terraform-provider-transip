@@ -3,8 +3,9 @@ package transip
 import (
 	"fmt"
 
+	tip "github.com/demeesterdev/terraform-provider-transip/transip/helpers/transip"
+
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/transip/gotransip"
 	"github.com/transip/gotransip/domain"
 )
 
@@ -28,7 +29,7 @@ func dataSourceDomain() *schema.Resource {
 }
 
 func dataSourceDomainRead(d *schema.ResourceData, m interface{}) error {
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Get("name").(string)
 	d.SetId(domainName)
 

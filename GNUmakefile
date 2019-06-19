@@ -17,7 +17,10 @@ test: fmtcheck
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor
 
 testacc: fmtcheck
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 180m -mod=vendor
+	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 180m -mod=vendor -coverprofile=cover.out
+
+testcover: testacc
+	go tool cover -html=cover.out
 
 # Currently required by tf-deploy compile
 fmtcheck:
@@ -33,7 +36,7 @@ tools:
 	GO111MODULE=off go get -u github.com/client9/misspell/cmd/misspell
 	GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 
-vendor:
+buildvendor:
 	go mod tidy
 	go mod download
 	go mod vendor

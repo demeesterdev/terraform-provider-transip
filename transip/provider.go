@@ -3,6 +3,8 @@ package transip
 import (
 	"fmt"
 
+	tip "github.com/demeesterdev/terraform-provider-transip/transip/helpers/transip"
+
 	"github.com/transip/gotransip"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -62,7 +64,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		clientConfig.PrivateKeyBody = []byte(privateKey)
 	}
 
-	c, err := gotransip.NewSOAPClient(clientConfig)
+	c, err := tip.NewRetryClient(clientConfig)
 	if err != nil {
 		return nil, fmt.Errorf("Error building TransIP API Client: %s", err)
 	}

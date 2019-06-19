@@ -1,8 +1,10 @@
-package err_fmt
+package transip
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/transip/gotransip/domain"
 )
 
@@ -22,4 +24,19 @@ func CreateDomainUnavailableError(name string, status domain.Status) error {
 	}
 
 	return fmt.Errorf("Domain [%s] is not available for registration: %s", name, msg)
+}
+
+func ParseSoapErrors(err error) *resource.RetryError {
+	if err != nil {
+		switch {
+		case strings.Contains(err.Error(), "OBJECT_IS_LOCKED"):
+			return resource.RetryableError(fmt.Errorf("Object is locked: %s", err))
+		case strings.Contains(err.Error(), "SOAP Fault 100"):
+			return resource.RetryableError(fmt.Errorf("Object is not editable at this moment: %s", err))
+		default:
+			return resource.NonRetryableError(err)
+		}
+	}
+
+	return nil
 }

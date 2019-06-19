@@ -3,7 +3,8 @@ package transip
 import (
 	"fmt"
 
-	"github.com/demeesterdev/terraform-provider-transip/transip/helpers/err_fmt"
+	tip "github.com/demeesterdev/terraform-provider-transip/transip/helpers/transip"
+
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/transip/gotransip"
@@ -26,6 +27,12 @@ func resourceDomain() *schema.Resource {
 				Required: true,
 			},
 
+			"manage_settings_only": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+
 			"name_servers": &schema.Schema{
 				Type:        schema.TypeList,
 				Optional:    true,
@@ -38,16 +45,25 @@ func resourceDomain() *schema.Resource {
 }
 
 func resourceDomainCreate(d *schema.ResourceData, m interface{}) error {
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Get("name").(string)
+	manageSettingsOnly := d.Get("manage_settings_only").(bool)
 
 	domainStatus, err := domain.CheckAvailability(c, domainName)
 	if err != nil {
 		return fmt.Errorf("Error checking availability for domain [%s]: %+v", domainName, err)
 	}
 
+	if manageSettingsOnly {
+		if domainStatus == domain.StatusInYourAccount {
+			d.SetId(domainName)
+			return resourceDomainUpdate(d, m)
+		}
+		return fmt.Errorf("Error managing domain [%s]: Domain is not in your account. Buy domain via https://transip.nl or set manage_settings_only=false", domainName)
+	}
+
 	if domainStatus != domain.StatusFree {
-		return err_fmt.CreateDomainUnavailableError(domainName, domainStatus)
+		return tip.CreateDomainUnavailableError(domainName, domainStatus)
 	}
 
 	d.Partial(true)
@@ -55,7 +71,7 @@ func resourceDomainCreate(d *schema.ResourceData, m interface{}) error {
 	newDomain := domain.Domain{
 		Name: domainName,
 	}
-	err = domain.Register(c, newDomain)
+	_, err = domain.Register(c, newDomain)
 	if err != nil {
 		return fmt.Errorf("Error registrating domain [%s]: %+v", domainName, err)
 	}
@@ -79,7 +95,7 @@ func resourceDomainCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceDomainRead(d *schema.ResourceData, m interface{}) error {
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Id()
 
 	info, err := domain.GetInfo(c, domainName)
@@ -120,15 +136,21 @@ func resourceDomainUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceDomainDelete(d *schema.ResourceData, m interface{}) error {
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Id()
+	manageSettingsOnly := d.Get("manage_settings_only").(bool)
+
+	if manageSettingsOnly {
+		d.SetId("")
+		return nil
+	}
 
 	err := domain.Cancel(c, domainName, gotransip.CancellationTimeEnd)
 	return err
 }
 
 func resourceDomainExists(d *schema.ResourceData, m interface{}) (bool, error) {
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Id()
 
 	domainStatus, err := domain.CheckAvailability(c, domainName)
@@ -142,12 +164,12 @@ func resourceDomainExists(d *schema.ResourceData, m interface{}) (bool, error) {
 	case domain.StatusInYourAccount:
 		return true, nil
 	}
-	return false, err_fmt.CreateDomainUnavailableError(domainName, domainStatus)
+	return false, tip.CreateDomainUnavailableError(domainName, domainStatus)
 }
 
 func updateDomainNameServers(d *schema.ResourceData, m interface{}) error {
 	var err error
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Id()
 
 	if err := awaitDomainAction(d, m, ""); err != nil {
@@ -165,7 +187,7 @@ func updateDomainNameServers(d *schema.ResourceData, m interface{}) error {
 }
 
 func awaitDomainAction(d *schema.ResourceData, m interface{}, action string) error {
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Id()
 
 	domainAction, err := domain.GetCurrentDomainAction(c, domainName)

@@ -1,4 +1,4 @@
-package err_fmt
+package transip
 
 import (
 	"regexp"
