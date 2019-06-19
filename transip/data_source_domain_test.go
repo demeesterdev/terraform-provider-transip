@@ -24,7 +24,7 @@ func TestAccDataSourceDomain(t *testing.T) {
 			},
 			{
 				Config:      testAccDataSourceDomainBasic("test.local"),
-				ExpectError: regexp.MustCompile("Could not request domain info \\[test.local\\]: .*"),
+				ExpectError: regexp.MustCompile(`Could not request domain info \[test.local\]: .*`),
 			},
 		},
 	})

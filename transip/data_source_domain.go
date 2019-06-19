@@ -2,8 +2,10 @@ package transip
 
 import (
 	"fmt"
+
+	tip "github.com/demeesterdev/terraform-provider-transip/transip/helpers/transip"
+
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/transip/gotransip"
 	"github.com/transip/gotransip/domain"
 )
 
@@ -27,7 +29,7 @@ func dataSourceDomain() *schema.Resource {
 }
 
 func dataSourceDomainRead(d *schema.ResourceData, m interface{}) error {
-	c := m.(*gotransip.SOAPClient)
+	c := m.(*tip.RetryClient)
 	domainName := d.Get("name").(string)
 	d.SetId(domainName)
 
@@ -36,15 +38,11 @@ func dataSourceDomainRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Could not request domain info [%s]: %s", domainName, err)
 	}
 
-	d.Set("name", domainName)
-
-	nameServers := make([]string, 0)
-	if info.Nameservers != nil {
-		for _, ns := range info.Nameservers {
-			nameServers = append(nameServers, ns.Hostname)
-		}
+	if err := d.Set("name", domainName); err != nil {
+		return err
 	}
-	if err := d.Set("name_servers", nameServers); err != nil {
+
+	if err := d.Set("name_servers", flattenNameServers(info.Nameservers)); err != nil {
 		return err
 	}
 
