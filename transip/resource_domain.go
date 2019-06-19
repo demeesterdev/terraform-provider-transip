@@ -33,7 +33,7 @@ func resourceDomain() *schema.Resource {
 				Default:  false,
 			},
 
-			"name_servers": &schema.Schema{
+			"name_servers": {
 				Type:        schema.TypeList,
 				Optional:    true,
 				Computed:    true,
