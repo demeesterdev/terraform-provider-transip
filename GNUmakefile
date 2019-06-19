@@ -14,16 +14,20 @@ build: fmtcheck
 test: fmtcheck
 	go test -mod=vendor -i $(TEST) || exit 1
 	echo $(TEST) | \
-		xargs -t -n4 --format short-verbose -- $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor -coverprofile=cover.out
+		xargs -t -n4 gotestsum --format short-verbose -- $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor
 
-testcover: test
+testcover: fmtcheck
+	go test -mod=vendor -i $(TEST) || exit 1
+	echo $(TEST) | \
+		xargs -t -n4 gotestsum --format short-verbose -- $(TESTARGS) -timeout=30s -parallel=4 -mod=vendor -covermode=count -coverprofile=cover.out
 	go tool cover -html=cover.out
 
 
 testacc: fmtcheck
-	TF_ACC=1 gotestsum --format short-verbose -- $(TEST) $(TESTARGS) -timeout 180m -coverprofile=cover-acc.out
+	TF_ACC=1 gotestsum --format short-verbose -- $(TEST) $(TESTARGS) -timeout 180m
 
-testacccover: testacc
+testacccover: fmtcheck
+	TF_ACC=1 gotestsum --format short-verbose -- $(TEST) $(TESTARGS) -timeout 180m -covermode=count -coverprofile=cover-acc.out
 	go tool cover -html=cover-acc.out
 
 # Currently required by tf-deploy compile

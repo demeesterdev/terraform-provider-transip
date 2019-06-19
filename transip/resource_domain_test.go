@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 )
 
@@ -87,14 +88,11 @@ func TestAccResourceDomain_ManageSettings_NameServers(t *testing.T) {
 	resourceName := "transip_domain.test_domain"
 
 	testNameServers := make([]string, 0)
-	testNameServers = append(testNameServers, "ns01.test.example")
-	testNameServers = append(testNameServers, "ns02.test.example")
-	testNameServers = append(testNameServers, "ns03.test.example")
+	nsID := acctest.RandStringFromCharSet(4, "0123456789")
 
-	defaultNameServers := make([]string, 0)
-	defaultNameServers = append(defaultNameServers, "ns0.transip.net")
-	defaultNameServers = append(defaultNameServers, "ns1.transip.nl")
-	defaultNameServers = append(defaultNameServers, "ns2.transip.eu")
+	testNameServers = append(testNameServers, fmt.Sprintf("ns1%s.test.example", nsID))
+	testNameServers = append(testNameServers, fmt.Sprintf("ns2%s.test.example", nsID))
+	testNameServers = append(testNameServers, fmt.Sprintf("ns3%s.test.example", nsID))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
@@ -102,15 +100,6 @@ func TestAccResourceDomain_ManageSettings_NameServers(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccResourceDomainConfigWithNS(domainName, true, testNameServers),
-			},
-			{
-				ResourceName:            resourceName,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"manage_settings_only"},
-			},
-			{
-				Config: testAccResourceDomainConfigWithNS(domainName, true, defaultNameServers),
 			},
 			{
 				ResourceName:            resourceName,
