@@ -73,7 +73,7 @@ func resourceDomainCreate(d *schema.ResourceData, m interface{}) error {
 	}
 	_, err = domain.Register(c, newDomain)
 	if err != nil {
-		return fmt.Errorf("Error registrating domain [%s]: %+v", domainName, err)
+		return fmt.Errorf("Error creating domain registration [%s]: %+v", domainName, err)
 	}
 
 	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {

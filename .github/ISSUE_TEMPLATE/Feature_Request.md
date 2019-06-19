@@ -22,7 +22,7 @@ about: I have a suggestion (and might want to implement myself 🙂)!
 
 <!--- Please list the new or affected resources and data sources. --->
 
-* azurerm_XXXXX
+* transip_XXXXX
 
 ### Potential Terraform Configuration
 
@@ -39,9 +39,8 @@ about: I have a suggestion (and might want to implement myself 🙂)!
 <!---
 Information about referencing Github Issues: https://help.github.com/articles/basic-writing-and-formatting-syntax/#referencing-issues-and-pull-requests
 
-Are there any other GitHub issues (open or closed) or pull requests that should be linked here? Vendor blog posts or documentation? For example:
+Are there any other GitHub issues (open or closed) or pull requests that should be linked here? Vendor blog posts or documentation? 
 
-* https://azure.microsoft.com/en-us/roadmap/virtual-network-service-endpoint-for-azure-cosmos-db/
 --->
 
 * #0000
