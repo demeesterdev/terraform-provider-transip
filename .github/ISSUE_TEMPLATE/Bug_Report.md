@@ -25,7 +25,7 @@ If you are running into one of these scenarios, we recommend opening an issue in
 
 <!--- Thank you for keeping this note for the community --->
 
-### Terraform (and AzureRM Provider) Version
+### Terraform (and Transip Provider) Version
 
 <!--- Please run `terraform -v` to show the Terraform core version and provider version(s). If you are not running the latest version of Terraform or the provider, please upgrade because your issue may have already been fixed. [Terraform documentation on provider versioning](https://www.terraform.io/docs/configuration/providers.html#provider-versions). --->
 
@@ -73,7 +73,7 @@ To obtain the debug output, see the [Terraform documentation on debugging](https
 
 ### Important Factoids
 
-<!--- Are there anything atypical about your accounts that we should know? For example: Running in a Azure China/Germany/Government? --->
+<!--- Are there anything atypical about your request that we should know? --->
 
 ### References
 
